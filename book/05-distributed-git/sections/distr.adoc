@@ -1,0 +1,91 @@
+=== Distribuerade arbetsflöden
+
+(((workflows)))
+I motsats till centraliserade versionshanteringssystem (CVCS) tillåter Gits distribuerade natur mer flexibilitet i utvecklares samarbete i projekt.
+I centraliserade system är varje utvecklare en nod som arbetar mer eller mindre likvärdigt mot ett nav.
+I Git kan varje utvecklare däremot vara både en nod och ett nav; det vill säga att varje utvecklare kan både bidra med kod till andra arkiv och underhålla ett öppet arkiv som andra kan förgrena sitt arbete på och bidra till.
+Det öppnar upp för en mängd olika möjligheter för samarbetet i ditt projekt och/eller i ditt team.
+Vi kommer att titta närmare på några vanliga processer som drar nytta av denna flexibilitet.
+Vi går igenom både styrkor och svagheter för varje arbetsprocess; du kan välja att använda en enda eller så kan du blanda och matcha olika finesser från varje.
+
+==== Centraliserad arbetsprocess
+
+(((workflows, centralized)))
+För centraliserade system finns det i stora drag en enda samarbetsmodell -- den centraliserade arbetsprocessen.
+Ett nav, eller _arkiv_, kan acceptera kod och alla synkroniserar sitt arbete mot det.
+Utvecklarna är noder -- konsumenter av navet -- och synkroniserar med den centrala enheten.
+
+.Centraliserad arbetsprocess.
+image::images/centralized_workflow.png[Centraliserad arbetsprocess.]
+
+Det innebär att om två utvecklare klonar navet och båda gör ändringar, kan den första utvecklaren som skickar upp sina ändringar göra det utan problem.
+Den andra utvecklaren måste sammanfoga den första utvecklarens arbete innan den skickar upp sina ändringar, för att inte skriva över den första utvecklarens ändringar.
+Det är likadant i Git som i Subversion(((Subversion))) (eller något annat CVCS), och i Git fungerar modellen utmärkt.
+
+Om du redan är bekväm med en centraliserad arbetsprocess i ditt företag eller team kan du enkelt fortsätta använda den med Git.
+Det är bara att sätta upp ett enda arkiv och ge alla i ditt team skrivbehörighet; Git kommer inte att låta användare skriva över varandras arbeten.
+
+Låt oss säga att John och Jessika båda börjar arbeta samtidigt.
+John avslutar sina ändringar och skickar upp dem till servern.
+Sen försöker Jessika att skicka upp sina, men servern avvisar dem.
+Hon får veta att hon försöker skicka upp ändringar som inte kan snabbspolas, och att hon inte kommer att kunna göra det förrän hon först hämtar och sammanfogar incheckade ändringar.
+Detta arbetsflöde är tilltalande för många eftersom det är ett tillvägagångssätt många är bekanta och bekväma med.
+
+Det är heller inte begränsat till små team.
+Gits grenmodell gör det möjligt för hundratals utvecklare att arbeta framgångsrikt på ett enda projekt genom dussintals grenar på en och samma gång.
+
+[[_integration_manager]]
+==== Integrationsstyrt arbetsprocess
+
+(((workflows, integration manager)))
+Eftersom Git tillåter dig att ha flera fjärrarkiv är det möjligt att med ett arbetsflöde där varje utvecklare har skrivbehörighet till sitt eget öppna arkiv och läsbehörighet till alla andras.
+Detta scenario inkluderar ofta ett arkiv som representerar det ``officiella'' projektet.
+För att bidra till det projektet gör du en öppen klon av det som du skickar dina ändringar till.
+Sen kan du skicka en förfrågan till förvaltaren till det officiella projektet att hämta dina ändringar.
+Förvaltaren kan då lägga till ditt arkiv som ett fjärrarkiv, testa dina ändringar lokalt, sammanfoga dem i sin gren och skicka tillbaka till sitt arkiv.
+Processen ser ut så här (se <<wfdiag_b>>):
+
+1. Förvaltaren skickar till sitt öppna arkiv.
+2. En deltagare klonar arkivet och gör ändringar.
+3. Deltagaren skickar sina ändringar till sin egna öppna klon.
+4. Deltagaren skickar ett e-postmeddelande till förvaltaren och ber att denne ska hämta ändringarna.
+5. Förvaltaren lägger till deltagarens arkiv som ett fjärrarkiv och sammanfogar ändringarna lokalt.
+6. Förvaltaren skickar de sammanfogade ändringarna till det officiella arkivet.
+
+[[wfdiag_b]]
+.Integrationssstyrd arbetsprocss.
+image::images/integration-manager.png[Integrationsstyrd arbetsprocess.]
+
+(((forking)))
+Detta är en mycket vanlig arbetsprocess med navbaserade verktyg som GitHub eller GitLab, där det är enkelt att förgrena ett projekt och skicka upp sina ändringar till sin publika förgrening.
+En av de största fördelarna med detta tillvägagångssätt är att du kan fortsätta ditt arbete, och förvaltaren av det officiella arkivet kan hämta dina ändringar när som helst.
+Deltagaren behöver inte vänta på att ändringarna ska slås samman innan hen kan jobba vidare -- varje part kan istället arbeta i sin egen takt.
+
+==== Diktatorns och löjtnanternas arbetsprocess
+
+(((workflows, dictator and lieutenants)))
+Diktatorns och löjtnanternas arbetssätt är en variant av ett flerarkivsarbetsflöde.
+Det används vanligtvis i stora projekt med hundratals medarbetare; ett känt exempel är Linuxkärnan.
+Olika integrationsansvariga har hand om vissa delar av arkivet; de kallas _löjtnanter_.
+Samtliga löjtnanter har en integrationsansvarig som kallas den välvillige diktatorn.
+Den välvillige diktatorn skickar från sin katalog till ett referensarkiv som alla medarbetare behöver hämta från.
+Processen fungerar så här (se <<wfdiag_c>>):
+
+1.  Regular developers work on their topic branch and rebase their work on top of `master`.
+The `master` branch is that of the reference repository to which the dictator pushes.
+2.  Lieutenants merge the developers' topic branches into their `master` branch.
+3.  The dictator merges the lieutenants' `master` branches into the dictator's `master` branch.
+4.  Finally, the dictator pushes that `master` branch to the reference repository so the other developers can rebase on it.
+
+[[wfdiag_c]]
+.Benevolent dictator workflow.
+image::images/benevolent-dictator.png[Benevolent dictator workflow.]
+
+This kind of workflow isn't common, but can be useful in very big projects, or in highly hierarchical environments.
+It allows the project leader (the dictator) to delegate much of the work and collect large subsets of code at multiple points before integrating them.
+
+==== Workflows Summary
+
+These are some commonly used workflows that are possible with a distributed system like Git, but you can see that many variations are possible to suit your particular real-world workflow.
+Now that you can (hopefully) determine which workflow combination may work for you, we'll cover some more specific examples of how to accomplish the main roles that make up the different flows.
+In the next section, you'll learn about a few common patterns for contributing to a project.
